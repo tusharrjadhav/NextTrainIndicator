@@ -7,52 +7,62 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.test.trainindicator.R;
-import com.test.trainindicator.TrainSchedule;
+import com.test.trainindicator.util.TrainSchedule;
 
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.ItemClickListener {
 
     private RecyclerView recyclerView;
     private MyRecyclerViewAdapter adapter;
     private TrainSchedule ts;
+    private Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle(getString(R.string.next_train));
         recyclerView = findViewById(R.id.recyclerView);
-
+        timer = new Timer();
         ts = new TrainSchedule();
-        updateUI();
-//        getTrainSchedule();
+        upateStatusEverySecond();
     }
 
     private void updateUI() {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new MyRecyclerViewAdapter(this, ts.nextTrains(Calendar.getInstance().getTime()));
+        //Time frame for 15min
+        adapter = new MyRecyclerViewAdapter(this, ts.nextTrains(Calendar.getInstance().getTime(), 15));
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
     }
 
-    public void getTrainSchedule() {
-        Calendar calendar = Calendar.getInstance();
+    /**
+     * To update the train schedule every second
+     */
+    private void upateStatusEverySecond() {
 
-        TrainSchedule ts = new TrainSchedule();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
 
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateUI();
+                    }
+                });
+            }
+        }, 0, 1000);
+    }
 
-        System.out.println("=========================================");
-
-        // Let's check how much time we have to the next train
-        System.out.println("It's " + calendar.getTime() + " you have " + ts.timeToNextTrain(calendar.getTime()) / 1000 + " seconds to the next train");
-
-        // Let's check how it would behave when we are before the schedule
-        calendar.set(Calendar.HOUR_OF_DAY, 5);
-        System.out.println("It's " + calendar.getTime() + " you have " + ts.timeToNextTrain(calendar.getTime()) / 1000 + " seconds to the first train from today's schedule");
-
-        // Let's check how it would behave when we are before the schedule
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        System.out.println("It's " + calendar.getTime() + " you have " + ts.timeToNextTrain(calendar.getTime()) / 1000 + " seconds to the first train from the next schedule");
+    @Override
+    protected void onPause() {
+        super.onPause();
+        timer.cancel();
     }
 
     @Override

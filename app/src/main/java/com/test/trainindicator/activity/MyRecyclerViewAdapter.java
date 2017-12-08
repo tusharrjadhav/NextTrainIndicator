@@ -10,8 +10,11 @@ import android.widget.TextView;
 import com.test.trainindicator.R;
 import com.test.trainindicator.data.Train;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Tushar_temp on 18/11/17
@@ -19,6 +22,7 @@ import java.util.List;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
+    public static final String FORMAT_MIN_SEC = "%02d min, %02d sec";
     private List<Train> mData = Collections.emptyList();
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
@@ -41,6 +45,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public void onBindViewHolder(ViewHolder holder, int position) {
         String title = mData.get(position).getDestination().getName();
         holder.myTextView.setText(title);
+        int index = position + 1;
+        holder.index.setText("" + index);
+        holder.remainingTime.setText(getRemainingTime(mData.get(position)));
     }
 
     // total number of rows
@@ -53,10 +60,15 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView myTextView;
+        public TextView remainingTime;
+        public TextView index;
+
 
         public ViewHolder(View itemView) {
             super(itemView);
+            index = itemView.findViewById(R.id.index);
             myTextView = itemView.findViewById(R.id.title);
+            remainingTime = itemView.findViewById(R.id.time);
             itemView.setOnClickListener(this);
         }
 
@@ -79,6 +91,16 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, int position);
+    }
+
+    public String getRemainingTime(Train train) {
+        Calendar calendar = Calendar.getInstance();
+        long remainingTime = train.getTime().getTime() - calendar.getTime().getTime();
+        return String.format(Locale.getDefault(), FORMAT_MIN_SEC,
+                TimeUnit.MILLISECONDS.toMinutes(remainingTime),
+                TimeUnit.MILLISECONDS.toSeconds(remainingTime) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(remainingTime))
+        );
     }
 
 }

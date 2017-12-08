@@ -1,4 +1,4 @@
-package com.test.trainindicator;
+package com.test.trainindicator.util;
 
 import android.util.Log;
 
@@ -26,13 +26,10 @@ import static com.test.trainindicator.data.Destination.WestMarket;
 public class TrainSchedule {
 
     // Train schedule
-    private List<Date> schedule;
     private TreeMap<Date, Train> scheduleMap;
 
 
     public TrainSchedule() {
-        schedule = new ArrayList<>();
-
         scheduleMap = new TreeMap<>();
         addTrainSchedule(CentralStation);
         addTrainSchedule(Circular);
@@ -47,8 +44,8 @@ public class TrainSchedule {
 
     /**
      * Adding all possible train times between given time slots
-     * @param destination Destination enum with name, frequency, start time, end time
      *
+     * @param destination Destination enum with name, frequency, start time, end time
      */
     private void addTrainSchedule(Destination destination) {
 
@@ -63,82 +60,64 @@ public class TrainSchedule {
         // Iterate from the first train date to the last train date to initialize the schedule
         for (long i = firstTrainMillis; i < lastTrainMillis; i += trainFrequencyMillis) {
             Date date = new Date(i);
-            schedule.add(date);
             scheduleMap.put(date, new Train(destination, date));
         }
     }
 
     /**
-     * Return time to next train in milliseconds
+     * Return next trains
      *
-     * @param time
-     * @return
+     * @param time Current time
+     * @param timeFrame Time frame in min for Next Train timing
+     * @return List of next trains
      */
-    public long timeToNextTrain(Date time) {
-        // Current time in milliseconds
-        long currentTime = time.getTime();
-
-        // Check if the trains are riding
-        if (currentTime <= schedule.get(0).getTime()) // You are before the first train
-            return schedule.get(0).getTime() - currentTime; // Time to the first train
-
-        if (currentTime >= schedule.get(schedule.size() - 1).getTime()) {  // You are after the last train
-            // You need to take the first train from the next day schedule
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(schedule.get(0).getTime() + 24 * 60 * 60 * 1000); // Set the next schedule first train time using this schedule first train time + one day in milliseconds
-
-            return calendar.getTimeInMillis() - currentTime;
-        }
-
-        // We are in the schedule - go through it
-        for (int i = 0; i < schedule.size(); i++) {
-            if (i == schedule.size() - 1) // We are at the last element, need to brake the loop
-                break;
-            // Time of the previous and next trains
-            long previous = schedule.get(i).getTime();
-            long next = schedule.get(i + 1).getTime();
-
-            if (currentTime > previous && currentTime < next)
-                return next - currentTime;
-
-        }
-
-        // Should never happen :)
-        return -1;
-    }
-
-    /**
-     * Return time to next train in milliseconds
-     *
-     * @param time
-     * @return
-     */
-    public List<Train> nextTrains(Date time) {
+    public List<Train> nextTrains(Date time, int timeFrame) {
         List<Train> trainList = new ArrayList<>();
 
         // Current time in milliseconds
         long currentTime = time.getTime();
 
+        // Set the time frame for schedule train time
+        long timeFrameEndTime = currentTime + timeFrame * 60 * 1000;
+
+        Date startTime = null;
+        Date endTime = null;
+
         // You are before the first train
         if (currentTime <= scheduleMap.firstKey().getTime()) {
-            trainList.addAll(scheduleMap.values());
+            startTime = scheduleMap.firstKey();
+
+            for (Map.Entry<Date, ?> entry : scheduleMap.entrySet()) {
+                if (timeFrameEndTime <= entry.getKey().getTime()) {
+                    endTime = entry.getKey();
+                    break;
+                }
+            }
 
         } else if (currentTime >= scheduleMap.lastKey().getTime()) {
             // You are after the last train
             // You need to take the first train from the next day schedule
             Calendar calendar = Calendar.getInstance();
             // Set the next schedule first train time using this schedule first train time + one day in milliseconds
-            calendar.setTimeInMillis(schedule.get(0).getTime() + 24 * 60 * 60 * 1000);
-            trainList.addAll(nextTrains(calendar.getTime()));
+            calendar.setTimeInMillis(scheduleMap.firstKey().getTime() + 24 * 60 * 60 * 1000);
+            trainList.addAll(nextTrains(calendar.getTime(), timeFrame));
         } else {
             // We are in the schedule - go through it
             for (Map.Entry<Date, ?> entry : scheduleMap.entrySet()) {
-                if (currentTime <= entry.getKey().getTime()) {
-                    SortedMap<Date, Train> dateTrainSortedMap = scheduleMap.subMap(entry.getKey(), scheduleMap.lastKey());
-                    trainList.addAll(dateTrainSortedMap.values());
+                if (currentTime <= entry.getKey().getTime() && startTime == null) {
+                    startTime = entry.getKey();
+                }
+                if (timeFrameEndTime <= entry.getKey().getTime()) {
+                    endTime = entry.getKey();
                     break;
                 }
+
             }
+        }
+        //Get the all Trains with in the given Time frame
+        if (endTime != null) {
+            SortedMap<Date, Train> dateTrainSortedMap = scheduleMap.subMap(startTime, endTime);
+            trainList.addAll(dateTrainSortedMap.values());
         }
 
         return trainList;
@@ -149,7 +128,7 @@ public class TrainSchedule {
      *
      * @return schedule
      */
-    public List<Date> getSchedule() {
-        return schedule;
+    public TreeMap getSchedule() {
+        return scheduleMap;
     }
 }

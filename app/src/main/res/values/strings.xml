@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">NextTrainIndicator</string>
+    <string name="next_train">Next Train</string>
 </resources>

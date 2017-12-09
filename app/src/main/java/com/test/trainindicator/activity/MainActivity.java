@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.darwindeveloper.wcviewpager.WCViewPagerIndicator;
 import com.test.trainindicator.R;
 import com.test.trainindicator.data.Train;
 import com.test.trainindicator.util.TrainSchedule;
@@ -19,9 +20,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
-    private ViewPager viewPager;
+    private WCViewPagerIndicator wcViewPagerIndicator;
     private TextView emptyMsgTx;
     private TrainSchedule ts;
     private Timer timer;
@@ -37,7 +38,10 @@ public class MainActivity extends AppCompatActivity {
         setTitle(getString(R.string.next_train));
         emptyMsgTx = findViewById(R.id.empty_msg);
         emptyMsgTx.setText(getString(R.string.empty_list_msg, "" + timeFrame));
-        viewPager = findViewById(R.id.pager);
+
+        wcViewPagerIndicator = findViewById(R.id.wcviewpager);
+        wcViewPagerIndicator.getViewPager().addOnPageChangeListener(this);
+
         timer = new Timer();
         ts = new TrainSchedule();
 
@@ -52,6 +56,22 @@ public class MainActivity extends AppCompatActivity {
     }
     //endregion
 
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        wcViewPagerIndicator.setSelectedindicator(position);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
     //region Custom Methods
     private void updateUI() {
 
@@ -60,13 +80,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (trains.isEmpty()) {
             emptyMsgTx.setVisibility(View.VISIBLE);
-            viewPager.setVisibility(View.GONE);
+            wcViewPagerIndicator.setVisibility(View.GONE);
         } else {
             emptyMsgTx.setVisibility(View.GONE);
-            viewPager.setVisibility(View.VISIBLE);
+            wcViewPagerIndicator.setVisibility(View.VISIBLE);
 
             MyAdapter mAdapter = new MyAdapter(getSupportFragmentManager(), trains);
-            viewPager.setAdapter(mAdapter);
+            wcViewPagerIndicator.setAdapter(mAdapter);
         }
     }
 
@@ -114,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
             return TrainScheduleFragment.instance(subTrains, position * 3);
         }
+
 
     }
 

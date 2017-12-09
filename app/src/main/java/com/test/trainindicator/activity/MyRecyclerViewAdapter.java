@@ -26,11 +26,13 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     private List<Train> mData = Collections.emptyList();
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+    private int initialIndex;
 
     // data is passed into the constructor
-    public MyRecyclerViewAdapter(Context context, List<Train> data) {
+    public MyRecyclerViewAdapter(Context context, List<Train> data, int index) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        initialIndex = index;
     }
 
     // inflates the row layout from xml when needed
@@ -45,7 +47,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public void onBindViewHolder(ViewHolder holder, int position) {
         String title = mData.get(position).getDestination().getName();
         holder.myTextView.setText(title);
-        int index = position + 1;
+        int index = initialIndex + position + 1;
         holder.index.setText("" + index);
         holder.remainingTime.setText(getRemainingTime(mData.get(position)));
     }

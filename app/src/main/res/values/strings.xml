@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">NextTrainIndicator</string>
     <string name="next_train">Next Train</string>
+    <string name="empty_list_msg">No train available for next %s min</string>
 </resources>

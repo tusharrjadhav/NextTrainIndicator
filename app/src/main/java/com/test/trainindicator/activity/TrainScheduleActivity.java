@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
+public class TrainScheduleActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
     private WCViewPagerIndicator wcViewPagerIndicator;
     private TextView emptyMsgTx;

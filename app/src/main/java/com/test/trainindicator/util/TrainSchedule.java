@@ -1,7 +1,5 @@
 package com.test.trainindicator.util;
 
-import android.util.Log;
-
 import com.test.trainindicator.data.Destination;
 import com.test.trainindicator.data.Train;
 
@@ -35,11 +33,6 @@ public class TrainSchedule {
         addTrainSchedule(Circular);
         addTrainSchedule(NorthSquare);
         addTrainSchedule(WestMarket);
-
-        /* Now, iterate over the map's contents, sorted by key. */
-        for (Map.Entry<Date, ?> entry : scheduleMap.entrySet()) {
-            Log.i("TrainSchedule", entry.getKey() + ": " + entry.getValue());
-        }
     }
 
     /**
@@ -67,7 +60,7 @@ public class TrainSchedule {
     /**
      * Return next trains
      *
-     * @param time Current time
+     * @param time      Current time
      * @param timeFrame Time frame in min for Next Train timing
      * @return List of next trains
      */

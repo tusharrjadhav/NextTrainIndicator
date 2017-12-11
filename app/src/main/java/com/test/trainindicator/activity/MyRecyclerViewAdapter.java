@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
     public static final String FORMAT_MIN_SEC = "%02d min, %02d sec";
+    public static final String FORMAT_MIN = "%02d min";
     private List<Train> mData = Collections.emptyList();
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;

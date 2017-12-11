@@ -8,6 +8,7 @@
         android:id="@+id/index"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
         android:paddingEnd="@dimen/text_padding"
         android:paddingStart="@dimen/text_padding"
         android:textSize="@dimen/text_size" />
@@ -16,6 +17,7 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
         android:layout_toEndOf="@+id/index"
         android:textSize="@dimen/text_size" />
 
@@ -23,6 +25,7 @@
         android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
         android:layout_alignParentEnd="true"
         android:paddingEnd="@dimen/text_padding"
         android:textSize="@dimen/text_size" />

@@ -7,25 +7,28 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.darwindeveloper.wcviewpager.WCViewPagerIndicator;
 import com.test.trainindicator.R;
 import com.test.trainindicator.data.Train;
-import com.test.trainindicator.util.TrainSchedule;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
-public class TrainScheduleActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
+public class TrainScheduleActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, TrainScheduleView {
 
     private WCViewPagerIndicator wcViewPagerIndicator;
     private TextView emptyMsgTx;
-    private TrainSchedule ts;
-    private Timer timer;
+
+    private EditText timeFrameEt;
+
+    private Button refreshButton;
+
+    private TrainSchedulePresenter presenter;
+
     //Time frame for 15min
     private int timeFrame = 15;
 
@@ -39,24 +42,33 @@ public class TrainScheduleActivity extends AppCompatActivity implements ViewPage
         emptyMsgTx = findViewById(R.id.empty_msg);
         emptyMsgTx.setText(getString(R.string.empty_list_msg, "" + timeFrame));
 
+        timeFrameEt = findViewById(R.id.editTimeFrame);
+        timeFrameEt.setText("" + timeFrame);
+
+        refreshButton = findViewById(R.id.refreshBt);
+
+        refreshButton.setOnClickListener(view -> {
+            timeFrame = Integer.valueOf(timeFrameEt.getText().toString());
+            presenter.refreshTrainScheduleTimeFrame(timeFrame);
+        });
+
         wcViewPagerIndicator = findViewById(R.id.wcviewpager);
         wcViewPagerIndicator.getViewPager().addOnPageChangeListener(this);
 
-        timer = new Timer();
-        ts = new TrainSchedule();
+        presenter = new TrainSchedulePresenter(this);
 
-
-        upateStatusEverySecond();
+        presenter.startTrainScheduleUpdate(timeFrame);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        timer.cancel();
+        presenter.stopTrainScheduleUpdate();
     }
     //endregion
 
 
+    //region OnPageChangeListener
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -71,42 +83,24 @@ public class TrainScheduleActivity extends AppCompatActivity implements ViewPage
     public void onPageScrollStateChanged(int state) {
 
     }
+    //endregion
 
     //region Custom Methods
-    private void updateUI() {
+    public void updateUI(List<Train> trains) {
+        runOnUiThread(() -> {
+            timeFrameEt.setText("" + timeFrame);
 
-        List<Train> trains = ts.nextTrains(Calendar.getInstance().getTime(), timeFrame);
-
-
-        if (trains.isEmpty()) {
-            emptyMsgTx.setVisibility(View.VISIBLE);
-            wcViewPagerIndicator.setVisibility(View.GONE);
-        } else {
-            emptyMsgTx.setVisibility(View.GONE);
-            wcViewPagerIndicator.setVisibility(View.VISIBLE);
-
-            MyAdapter mAdapter = new MyAdapter(getSupportFragmentManager(), trains);
-            wcViewPagerIndicator.setAdapter(mAdapter);
-        }
-    }
-
-    /**
-     * To update the train schedule every second
-     */
-    private void upateStatusEverySecond() {
-
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateUI();
-                    }
-                });
+            if (trains.isEmpty()) {
+                emptyMsgTx.setVisibility(View.VISIBLE);
+                wcViewPagerIndicator.setVisibility(View.GONE);
+            } else {
+                emptyMsgTx.setVisibility(View.GONE);
+                wcViewPagerIndicator.setVisibility(View.VISIBLE);
+                MyAdapter mAdapter = new MyAdapter(getSupportFragmentManager(), trains);
+                wcViewPagerIndicator.setAdapter(mAdapter);
             }
-        }, 0, 10000);
+        });
+
     }
     //endregion
 

@@ -28,6 +28,7 @@ public class TrainScheduleFragment extends Fragment {
     private MyRecyclerViewAdapter adapter;
 
 
+    //region Constructor method
     public static TrainScheduleFragment instance(ArrayList<Train> trainList, int index) {
         TrainScheduleFragment fragment = new TrainScheduleFragment();
         Bundle bundle = new Bundle();
@@ -36,7 +37,9 @@ public class TrainScheduleFragment extends Fragment {
         fragment.setArguments(bundle);
         return fragment;
     }
+    //endregion
 
+    //region Fragment Lifecycle
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -46,7 +49,10 @@ public class TrainScheduleFragment extends Fragment {
         updateUI();
         return rootView;
     }
+    //endregion
 
+
+    //region custom methods
     private void updateUI() {
         List<Train> trainList = (List<Train>) getArguments().getSerializable(EXTRA_TRAINS);
 
@@ -55,5 +61,6 @@ public class TrainScheduleFragment extends Fragment {
         adapter = new MyRecyclerViewAdapter(getContext(), trainList, getArguments().getInt(EXTRA_TRAINS_INDEX, 0));
         recyclerView.setAdapter(adapter);
     }
+    //endregion
 
 }

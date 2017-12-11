@@ -2,4 +2,7 @@
     <string name="app_name">NextTrainIndicator</string>
     <string name="next_train">Next Train</string>
     <string name="empty_list_msg">No train available for next %s min</string>
+    <string name="time_frame_msg">Current Train schedule time frame is %s min</string>
+    <string name="set_time_frame">Time Frame in min: </string>
+    <string name="refresh">Refresh</string>
 </resources>

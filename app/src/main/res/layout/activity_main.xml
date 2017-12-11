@@ -7,6 +7,37 @@
     android:orientation="vertical"
     android:padding="4dip">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/text_padding"
+        android:paddingEnd="@dimen/text_padding"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/text_padding"
+            android:text="@string/set_time_frame"
+            android:textSize="@dimen/text_size" />
+
+        <EditText
+            android:id="@+id/editTimeFrame"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/refreshBt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:padding="@dimen/text_padding"
+            android:text="@string/refresh" />
+
+    </LinearLayout>
+
     <com.darwindeveloper.wcviewpager.WCViewPagerIndicator
         android:id="@+id/wcviewpager"
         android:layout_width="match_parent"
@@ -25,5 +56,6 @@
         android:padding="@dimen/text_padding"
         android:text="@string/empty_list_msg"
         android:textSize="@dimen/text_size" />
+
 
 </LinearLayout>

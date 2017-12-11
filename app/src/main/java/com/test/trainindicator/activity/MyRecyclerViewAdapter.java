@@ -22,20 +22,23 @@ import java.util.concurrent.TimeUnit;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
-    public static final String FORMAT_MIN_SEC = "%02d min, %02d sec";
-    public static final String FORMAT_MIN = "%02d min";
+    private static final String FORMAT_MIN_SEC = "%02d min, %02d sec";
+    private static final String FORMAT_MIN = "%02d min";
     private List<Train> mData = Collections.emptyList();
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private int initialIndex;
 
+    //region Constructor
     // data is passed into the constructor
-    public MyRecyclerViewAdapter(Context context, List<Train> data, int index) {
+    MyRecyclerViewAdapter(Context context, List<Train> data, int index) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
         initialIndex = index;
     }
+    //endregion
 
+    //region RecyclerView.Adapte method
     // inflates the row layout from xml when needed
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -58,16 +61,18 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public int getItemCount() {
         return mData.size();
     }
+    //endregion
 
 
+    //region InnerClass
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public TextView myTextView;
-        public TextView remainingTime;
-        public TextView index;
+        TextView myTextView;
+        TextView remainingTime;
+        TextView index;
 
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             index = itemView.findViewById(R.id.index);
             myTextView = itemView.findViewById(R.id.title);
@@ -80,7 +85,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
         }
     }
+    //endregion
 
+    //region Custom Methods
     // convenience method for getting data at click position
     public Train getItem(int id) {
         return mData.get(id);
@@ -96,14 +103,14 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         void onItemClick(View view, int position);
     }
 
-    public String getRemainingTime(Train train) {
+    private String getRemainingTime(Train train) {
         Calendar calendar = Calendar.getInstance();
         long remainingTime = train.getTime().getTime() - calendar.getTime().getTime();
-        return String.format(Locale.getDefault(), FORMAT_MIN_SEC,
-                TimeUnit.MILLISECONDS.toMinutes(remainingTime),
-                TimeUnit.MILLISECONDS.toSeconds(remainingTime) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(remainingTime))
-        );
+        long toMinutes = TimeUnit.MILLISECONDS.toMinutes(remainingTime);
+        long toSecond = TimeUnit.MILLISECONDS.toSeconds(remainingTime) -
+                TimeUnit.MINUTES.toSeconds(toMinutes);
+        return String.format(Locale.getDefault(), FORMAT_MIN_SEC, toMinutes, toSecond);
     }
+    //endregion
 
 }

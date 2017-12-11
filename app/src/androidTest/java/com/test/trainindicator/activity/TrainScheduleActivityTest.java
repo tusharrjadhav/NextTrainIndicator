@@ -1,6 +1,7 @@
 package com.test.trainindicator.activity;
 
 
+import android.os.SystemClock;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -15,67 +16,89 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.swipeLeft;
-import static android.support.test.espresso.action.ViewActions.swipeRight;
-import static android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
+import static android.support.test.espresso.action.ViewActions.replaceText;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class TrainScheduleActivityTest {
 
+    private ViewInteraction editText;
+
+    private ViewInteraction refreshButton;
+
+    private ViewInteraction emptyTextView;
+
+    private ViewInteraction viewPager;
+
     @Rule
     public ActivityTestRule<TrainScheduleActivity> mActivityTestRule = new ActivityTestRule<>(TrainScheduleActivity.class);
 
+    @Before
+    public void setUp() {
+
+        editText = onView(
+                allOf(withId(R.id.editTimeFrame),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.LinearLayout")),
+                                        0),
+                                1),
+                        isDisplayed()));
+
+
+        refreshButton = onView(
+                allOf(withId(R.id.refreshBt), withText("Refresh"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.LinearLayout")),
+                                        0),
+                                2),
+                        isDisplayed()));
+
+
+        emptyTextView = onView(
+                withId(R.id.empty_msg));
+
+
+        viewPager = onView(
+                withId(R.id.wcviewpager));
+        SystemClock.sleep(200);
+    }
+
     @Test
-    public void mainActivityTest() {
-        ViewInteraction recyclerView = onView(
-                allOf(withId(R.id.recyclerviewIndicators),
-                        childAtPosition(
-                                withClassName(is("android.widget.LinearLayout")),
-                                1)));
-        recyclerView.perform(actionOnItemAtPosition(1, click()));
+    public void trainScheduleForZeroTimeFrame() {
 
-        ViewInteraction wrapContentViewPager = onView(
-                allOf(withId(R.id.wrap_content_viewpager),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.wcviewpager),
-                                        0),
-                                0),
-                        isDisplayed()));
-        wrapContentViewPager.perform(swipeLeft());
+        editText.perform(replaceText("0"));
 
-        ViewInteraction wrapContentViewPager2 = onView(
-                allOf(withId(R.id.wrap_content_viewpager),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.wcviewpager),
-                                        0),
-                                0),
-                        isDisplayed()));
-        wrapContentViewPager2.perform(swipeLeft());
+        refreshButton.perform(click());
+        SystemClock.sleep(200);
+        viewPager.check(matches(not(isDisplayed())));
+        emptyTextView.check(matches(isDisplayed()));
 
-        ViewInteraction wrapContentViewPager3 = onView(
-                allOf(withId(R.id.wrap_content_viewpager),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.wcviewpager),
-                                        0),
-                                0),
-                        isDisplayed()));
-        wrapContentViewPager3.perform(swipeRight());
+    }
 
+    @Test
+    public void trainScheduleNonEmpty() {
+        editText.perform(replaceText("60"));
+        refreshButton.perform(click());
+        SystemClock.sleep(200);
+        viewPager.check(matches(isDisplayed()));
+        emptyTextView.check(matches(not(isDisplayed())));
     }
 
     @Test

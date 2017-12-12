@@ -118,13 +118,18 @@ public class TrainScheduleActivity extends AppCompatActivity implements ViewPage
 
         @Override
         public int getCount() {
-            return (int) Math.floor(trainList.size() / 3);
+            return (int) Math.ceil(trainList.size() / 3.0);
         }
 
         @Override
         public Fragment getItem(int position) {
-
-            ArrayList<Train> subTrains = new ArrayList<>(trainList.subList(position * 3, position * 3 + 3));
+            ArrayList<Train> subTrains;
+            int lastIndexForTrainList = position * 3 + 3;
+            if (lastIndexForTrainList < trainList.size()) {
+                subTrains = new ArrayList<>(trainList.subList(position * 3, lastIndexForTrainList));
+            } else {
+                subTrains = new ArrayList<>(trainList);
+            }
 
             return TrainScheduleFragment.instance(subTrains, position * 3);
         }

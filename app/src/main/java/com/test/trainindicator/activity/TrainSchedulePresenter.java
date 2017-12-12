@@ -33,11 +33,12 @@ public class TrainSchedulePresenter {
      * @param timeFrame Train schedule time frame
      */
     public void startTrainScheduleUpdate(int timeFrame) {
-        final List<Train> trains = trainSchedule.nextTrains(Calendar.getInstance().getTime(), timeFrame);
+
         timer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
+                List<Train> trains = trainSchedule.nextTrains(Calendar.getInstance().getTime(), timeFrame);
                 view.updateUI(trains);
             }
         };

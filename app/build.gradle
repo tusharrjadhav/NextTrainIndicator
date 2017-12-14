@@ -28,6 +28,8 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
     implementation "com.android.support.constraint:constraint-layout:$rootProject.constraintLayout"
     implementation "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
+    implementation "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
+
     testImplementation "junit:junit:$rootProject.junitVersion"
     testImplementation "org.mockito:mockito-core:$rootProject.mockitoVersion"
     testImplementation "org.assertj:assertj-core:$rootProject.assertj"

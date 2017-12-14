@@ -22,11 +22,11 @@ public class TrainSchedulePresenterTest {
     @Mock
     private TrainScheduleView view;
 
-    private TrainSchedulePresenter presenter;
+    private TrainScheduleViewModel presenter;
 
     @Before
     public void setUp() throws Exception {
-        presenter = new TrainSchedulePresenter(view);
+        presenter = new TrainScheduleViewModel(view);
     }
 
     @Test

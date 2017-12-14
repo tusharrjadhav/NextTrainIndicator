@@ -1,11 +1,14 @@
 package com.test.trainindicator.activity;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,7 +21,7 @@ import com.test.trainindicator.data.Train;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrainScheduleActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, TrainScheduleView {
+public class TrainScheduleActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
     private WCViewPagerIndicator wcViewPagerIndicator;
     private TextView emptyMsgTx;
@@ -27,7 +30,7 @@ public class TrainScheduleActivity extends AppCompatActivity implements ViewPage
 
     private Button refreshButton;
 
-    private TrainSchedulePresenter presenter;
+    private TrainScheduleViewModel viewModel;
 
     //Time frame for 15min
     private int timeFrame = 15;
@@ -49,21 +52,22 @@ public class TrainScheduleActivity extends AppCompatActivity implements ViewPage
 
         refreshButton.setOnClickListener(view -> {
             timeFrame = Integer.valueOf(timeFrameEt.getText().toString());
-            presenter.refreshTrainScheduleTimeFrame(timeFrame);
+            viewModel.refreshTrainScheduleTimeFrame(timeFrame);
         });
 
         wcViewPagerIndicator = findViewById(R.id.wcviewpager);
         wcViewPagerIndicator.getViewPager().addOnPageChangeListener(this);
 
-        presenter = new TrainSchedulePresenter(this);
+        TrainScheduleViewModelFactory modelFactory = new TrainScheduleViewModelFactory(timeFrame);
+        viewModel = ViewModelProviders.of(this, modelFactory).get(TrainScheduleViewModel.class);
 
-        presenter.startTrainScheduleUpdate(timeFrame);
+        subscribe();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        presenter.stopTrainScheduleUpdate();
+    protected void onDestroy() {
+        super.onDestroy();
+        viewModel.stopTrainScheduleUpdate();
     }
     //endregion
 
@@ -86,21 +90,22 @@ public class TrainScheduleActivity extends AppCompatActivity implements ViewPage
     //endregion
 
     //region Custom Methods
-    public void updateUI(List<Train> trains) {
-        runOnUiThread(() -> {
+    private void subscribe() {
+        final Observer<List<Train>> trainTScheduleObserver = trainList -> {
+            Log.d(TrainScheduleActivity.class.getSimpleName(), "On UI update");
             timeFrameEt.setText("" + timeFrame);
 
-            if (trains.isEmpty()) {
+            if (trainList.isEmpty()) {
                 emptyMsgTx.setVisibility(View.VISIBLE);
                 wcViewPagerIndicator.setVisibility(View.GONE);
             } else {
                 emptyMsgTx.setVisibility(View.GONE);
                 wcViewPagerIndicator.setVisibility(View.VISIBLE);
-                MyAdapter mAdapter = new MyAdapter(getSupportFragmentManager(), trains);
+                MyAdapter mAdapter = new MyAdapter(getSupportFragmentManager(), trainList);
                 wcViewPagerIndicator.setAdapter(mAdapter);
             }
-        });
-
+        };
+        viewModel.getTrainsLiveData().observe(this, trainTScheduleObserver);
     }
     //endregion
 

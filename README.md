@@ -12,6 +12,8 @@
 	This time table refresh every 10s.
 	Default time frame for Time table is 15m. User have option to change this time frame. If there is not train available for given Time frame user with given empty msg “No train available for next _min”
 
+![screenshot_1513061273](https://user-images.githubusercontent.com/3032854/34292545-56f54b5c-e727-11e7-8a6d-26f77d7ff57a.png)
+
 **Design pattern: Model View Presenter (MVP) design pattern is been followed**
 - Train.java - model
 - TrainScheduleView.java, TrainScheduleActivity.java - View
